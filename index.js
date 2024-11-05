@@ -3,7 +3,7 @@ const input = require("input")
 const game = [
   [1, 2, 3],
   [4, 5, 6],
-  [7, "x", 9],
+  [7, 8, 9],
 ];
 
 const indekslar = [
@@ -17,8 +17,7 @@ const indekslar = [
     [2,0],
     [2,1],
     [2,2]
-]
-
+];
 
 const printGame = (game) => {
   let text = "";
@@ -41,7 +40,6 @@ const printGame = (game) => {
 
   console.log(text);
 };
-
 
 function tekshirish(game){
     // Qatorlarni tekshirish
@@ -74,67 +72,60 @@ function tekshirish(game){
         return (game[1][1] == "x" ? {end: true, winner: "x"}:{end: true, winner: "o"})
     }
 
-    let durrang = false;
+    let count = 0;
     for(let i = 0; i < game.length; i++){
         for(let j = 0; j < game[i].length; j++){
-            // if(Number.isNaN())
+            if(game[i][j] == "x" || game[i][j] == "o"){
+                count++;
+            }
         }
+    }
+
+    if(count == 9){
+        return {end: true, winner: "Durrang"}
     }
 
     return {
         end: false
     }
-
 }
-
 
 async function main() {
     try {
-        
-        let oyinchi = Math.floor(Math.random()*2) === 0 ? "x":"o";
-
+        let oyinchi = Math.floor(Math.random() * 2) === 0 ? "x" : "o";
         console.log(`O'yinni ${oyinchi} o'yinchi boshlab beradi.`);
-        
 
-        while(true){
-
+        while (true) {
             printGame(game);
-            console.log()
+            console.log();
 
-            const tanlov = game.join(",").split(",").map(x=>Number(x)).filter(Number);
+            let tanlov = game.join(",").split(",").map(x => Number(x)).filter(Number);
 
-            const select = tanlov.map(x=>{
-                return {
+            if (tanlov.length === 1) {
+                const remainingMove = tanlov[0];
+                game[indekslar[remainingMove][0]][indekslar[remainingMove][1]] = oyinchi;
+            } else {
+                const select = tanlov.map(x => ({
                     name: x.toString(),
                     value: x
-                }
-            });
+                }));
 
-            
-            const raqam = await input.select(`${oyinchi} raqam tanlang: `, select);
-
-            game[indekslar[raqam][0]][indekslar[raqam][1]] = oyinchi;
-
-
-
-            const javob = tekshirish(game);
-
-            printGame(game);
-
-            if(javob.end){
-                return console.log(`${javob?.winner} g'alaba qozondi!`)
+                const raqam = await input.select(`${oyinchi} raqam tanlang: `, select);
+                game[indekslar[raqam][0]][indekslar[raqam][1]] = oyinchi;
             }
 
-            oyinchi = oyinchi == "x" ? "o":"x";
-            
+            const javob = tekshirish(game);
+            printGame(game);
+
+            if (javob.end) {
+                return console.log(`${javob?.winner} g'alaba qozondi!`);
+            }
+
+            oyinchi = oyinchi == "x" ? "o" : "x";
         }
-
-        console.log(game.join(",").split(",").map(x=>Number(x)).filter(Number))
-
     } catch (error) {
         console.log(error);
     }
 }
-
 
 main();
